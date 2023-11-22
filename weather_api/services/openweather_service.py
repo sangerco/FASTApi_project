@@ -1,18 +1,31 @@
-import datetime
+from datetime import datetime
 from typing import Optional
 from services import lat_long
+import httpx
+
+weather_api_key: Optional[str] = None
 
 
-def get_report(
+async def get_report_async(
     city: str, state: Optional[str], country: str = "US", units: str = "metric"
 ) -> dict:
-    lat_long = lat_long.get_lat_long(city, state, country)
+    if state:
+        location_result = await lat_long.get_lat_long_async(city, state, country)
+    else:
+        location_result = await lat_long.get_lat_long_async(city, country)
 
-    lat = lat_long.results[0].geometry.lat
-    long = lat_long.results[0].geometry.long
+    lat = location_result[0]["geometry"]["lat"]
+    long = location_result[0]["geometry"]["lng"]
 
     current_date = datetime.now()
     date = current_date.strftime("%Y-%m-%d")
-    key = "d9c6c158c8a553dd5f516ff9c9a75498"
 
-    url = f"https://api.openweathermap.org/data/3.0/onecall/day_summary?lat={lat}&lon={long}&date={date}&appid={key}&units={units}"
+    url = f"https://api.openweathermap.org/data/3.0/onecall/day_summary?lat={lat}&lon={long}&date={date}&appid={weather_api_key}&units={units}"
+
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(url)
+        resp.raise_for_status()
+
+    data = resp.json()
+
+    return data

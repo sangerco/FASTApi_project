@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 import fastapi
 import uvicorn
 from starlette.templating import Jinja2Templates
@@ -5,6 +7,8 @@ from starlette.requests import Request
 from starlette.staticfiles import StaticFiles
 
 from api import weather_api
+from services import openweather_service
+from services import lat_long
 from views import home
 
 api = fastapi.FastAPI()
@@ -12,6 +16,23 @@ api = fastapi.FastAPI()
 
 def configure():
     configure_routing()
+    configure_api_keys()
+
+
+def configure_api_keys():
+    file = Path("settings.json").absolute()
+    if not file.exists():
+        print(
+            f"WARNING: {file} file not found, you cannot continue, please see settings_template.json"
+        )
+        raise Exception(
+            "settings.json file not found, you cannot continue, please see settings_template.json"
+        )
+
+    with open("settings.json") as fin:
+        settings = json.load(fin)
+        openweather_service.weather_api_key = settings.get("weather_api_key")
+        lat_long.lat_long_api_key = settings.get("lat_long_api_key")
 
 
 def configure_routing():

@@ -1,0 +1,5 @@
+{
+    "weather_api_key": "not real key",
+    "lat_long_api_key": "not real key",
+    "action": "copy this to settings.json with real values"
+}
