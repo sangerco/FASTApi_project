@@ -22,4 +22,5 @@ async def get_lat_long_async(
 
     data = resp.json()
     location = data["results"]
+    # print(location)
     return location
