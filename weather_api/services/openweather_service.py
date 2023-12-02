@@ -9,7 +9,7 @@ weather_api_key: Optional[str] = None
 
 
 async def get_report_async(
-    city: str, state: Optional[str], country: str = "US", units: str = "metric"
+    city: str, state: Optional[str], country: str = "US", units: str = "imperial"
 ) -> dict:
     city, state, country, units = validate_units(city, state, country, units)
 
@@ -28,6 +28,8 @@ async def get_report_async(
     date = current_date.strftime("%Y-%m-%d")
 
     url = f"https://api.openweathermap.org/data/3.0/onecall/day_summary?lat={lat}&lon={long}&date={date}&appid={weather_api_key}&units={units}"
+
+    print(url)
 
     async with httpx.AsyncClient() as client:
         resp = await client.get(url)
